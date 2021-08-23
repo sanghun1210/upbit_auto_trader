@@ -6,10 +6,8 @@ from .base_trader import *
 
 import os
 import sys
-from .candle import *
-from .calcualtor import *
 
-import pandas as pd
+
 
 def get_candle_list(market_name, minute_unit, count) :
     str_list = []
@@ -25,40 +23,32 @@ def get_candle_list(market_name, minute_unit, count) :
 class Minute240Trader(BaseTrader):
     def __init__(self, market_name, count, src_logger):
         super().__init__(market_name, src_logger)
-        json_candles = get_candle_list(market_name, 240, count)
-        
+        self.json_candles = get_candle_list(market_name, 240, count)
 
-        import numpy as np
+        self.market_data = pd.DataFrame(self.json_candles)
+        self.market_data = self.market_data[::-1].reset_index(drop=True)
+        self.market_data['daily_difference'] = self.market_data['trade_price'].diff()
+        # self.market_data['signal'] = 0.0
+        # self.market_data['signal'][:] = np.where(self.market_data['daily_difference'][:] > 0, 1.0, 0.0)
+        # self.market_data['positions'] = self.market_data['signal'].diff()
 
-        goog_data_signal = pd.DataFrame(json_candles)
-        goog_data_signal = goog_data_signal[::-1].reset_index(drop=True)
-        goog_data_signal['daily_difference'] = goog_data_signal['trade_price'].diff()
-        goog_data_signal['signal'] = 0.0
-        goog_data_signal['signal'][:] = np.where(goog_data_signal['daily_difference'][:] > 0, 1.0, 0.0)
-        goog_data_signal['positions'] = goog_data_signal['signal'].diff()
+        self.trading_support_resistance(self.market_data)
 
-        import matplotlib.pyplot as plt
         fig = plt.figure()
         ax1 = fig.add_subplot(111, ylabel='Google price in $')
-        goog_data_signal['trade_price'].plot(ax=ax1, color='r', lw=2.)
+        self.market_data['sup'].plot(ax=ax1, color='g', lw=2.)
+        self.market_data['res'].plot(ax=ax1, color='b', lw=2.)
+        self.market_data['trade_price'].plot(ax=ax1, color='r', lw=2.)
 
-        ax1.plot(goog_data_signal.loc[goog_data_signal.positions == 1.0].index,
-         goog_data_signal.trade_price[goog_data_signal.positions == 1.0],
-         '^', markersize=5, color='m')
+        ax1.plot(self.market_data.loc[self.market_data.positions == 1.0].index,
+         self.market_data.trade_price[self.market_data.positions == 1.0],
+         'v', markersize=7, color='k', label='sell')
 
-        ax1.plot(goog_data_signal.loc[goog_data_signal.positions == -1.0].index,
-         goog_data_signal.trade_price[goog_data_signal.positions == -1.0],
-         'v', markersize=5, color='k')
+        ax1.plot(self.market_data.loc[self.market_data.positions == -1.0].index,
+         self.market_data.trade_price[self.market_data.positions == -1.0],
+         '^', markersize=7, color='k', label='buy')
 
         plt.show()
-
-
-        # self.create_candle_list_from_json(json_candles)
-        # self.trader_name = 'Minute240Trader'
-        # self.cross_margin = 0.8
-
-    
-
 
 
 

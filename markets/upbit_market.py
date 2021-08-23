@@ -65,15 +65,15 @@ class UpbitMarket(BaseMarket):
         # time.sleep(0.1)
         # self.minute15_trader = Minute15Trader(market_name, 120, src_logger)
         # time.sleep(0.1)
-        self.minute30_trader = Minute30Trader(market_name, 100, src_logger)
+        # self.minute30_trader = Minute30Trader(market_name, 100, src_logger)
+        # time.sleep(0.15)
+        # self.minute60_trader = Minute60Trader(market_name, 100, src_logger)
         time.sleep(0.15)
-        self.minute60_trader = Minute60Trader(market_name, 100, src_logger)
-        time.sleep(0.15)
-        self.minute240_trader = Minute240Trader(market_name, 100, src_logger)
-        time.sleep(0.15)
-        self.day_trader = DayTrader(market_name, 100, src_logger)
-        time.sleep(0.15)
-        self.week_trader = WeekTrader(market_name, 20, src_logger)
+        self.minute240_trader = Minute240Trader(market_name, 500, src_logger)
+        # time.sleep(0.15)
+        # self.day_trader = DayTrader(market_name, 100, src_logger)
+        # time.sleep(0.15)
+        # self.week_trader = WeekTrader(market_name, 20, src_logger)
 
     def find_best_markets(self, market_group_name):
         market_name_list = []
