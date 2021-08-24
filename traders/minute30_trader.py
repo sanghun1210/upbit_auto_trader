@@ -7,7 +7,6 @@ from .base_trader import *
 import os
 import sys
 from .candle import *
-from .calcualtor import *
 
 def get_candle_list(market_name, minute_unit, count) :
     str_list = []
@@ -20,16 +19,13 @@ def get_candle_list(market_name, minute_unit, count) :
     return response.json()
 
 
-class Minute60Trader(BaseTrader):
+class Minute30Trader(BaseTrader):
     def __init__(self, market_name, count, src_logger):
         super().__init__(market_name, src_logger)
-        json_candles = get_candle_list(market_name, 60, count)
+        json_candles = get_candle_list(market_name, 30, count)
         self.create_candle_list_from_json(json_candles)
-        self.trader_name = 'Minute60Trader'
-        self.cross_margin = 0.7
-        self.max_bollinger_bands_width = 7
-        self.min_ma = 10
-        self.max_ma = 50
+        self.trader_name = 'Minute30Trader'
 
+    
 
 

@@ -8,11 +8,11 @@ import os
 import sys
 
 from .candle import *
-from .calcualtor import *
 
-def get_day_candle_list(market_name, count) :
+
+def get_week_candle_list(market_name, count) :
     str_list = []
-    str_list.append("https://api.upbit.com/v1/candles/days")
+    str_list.append("https://api.upbit.com/v1/candles/weeks")
     url =  ''.join(str_list)
     querystring = {"market": market_name, "count": count}
     response = requests.request("GET", url, params=querystring)
@@ -20,13 +20,12 @@ def get_day_candle_list(market_name, count) :
     return response.json()
 
 
-class DayTrader(BaseTrader):
+class WeekTrader(BaseTrader):
     def __init__(self, market_name, count, src_logger):
         super().__init__(market_name, src_logger)
-        json_candles = get_day_candle_list(market_name, count)
+        json_candles = get_week_candle_list(market_name, count)
         self.create_candle_list_from_json(json_candles)
-        self.trader_name = 'DayTrader'
 
-
+    
 
 
