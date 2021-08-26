@@ -31,7 +31,10 @@ def main():
             market_name = market.get("market")
             data_center = UpbitDataCenter(market_name)
             print(market_name)
-            algorithms.stddev(data_center.minute240_trader.data)
+            algorithms.macd(data_center.minute240_trader.data)
+            # ts = algorithms.double_moving_average(data_center.minute60_trader.data,20,100)
+            # algorithms.plot_double_moving_average(ts, data_center.minute60_trader.data)
+
 
     except Exception as e:    
         print("raise error ", e)

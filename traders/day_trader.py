@@ -9,7 +9,7 @@ import sys
 
 from .candle import *
 
-def get_day_candle_list(market_name, count) :
+def get_candle_list(market_name, count) :
     str_list = []
     str_list.append("https://api.upbit.com/v1/candles/days")
     url =  ''.join(str_list)
@@ -20,11 +20,11 @@ def get_day_candle_list(market_name, count) :
 
 
 class DayTrader(BaseTrader):
-    def __init__(self, market_name, count, src_logger):
-        super().__init__(market_name, src_logger)
-        json_candles = get_day_candle_list(market_name, count)
-        self.create_candle_list_from_json(json_candles)
-        self.trader_name = 'DayTrader'
+    def __init__(self, market_name, count):
+        super().__init__(market_name)
+        self.json_candles = get_candle_list(market_name, count)
+        self.data = pd.DataFrame(self.json_candles)
+        self.data = self.data[::-1].reset_index(drop=True)
 
 
 
