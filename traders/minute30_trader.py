@@ -20,11 +20,11 @@ def get_candle_list(market_name, minute_unit, count) :
 
 
 class Minute30Trader(BaseTrader):
-    def __init__(self, market_name, count, src_logger):
-        super().__init__(market_name, src_logger)
-        json_candles = get_candle_list(market_name, 30, count)
-        self.create_candle_list_from_json(json_candles)
-        self.trader_name = 'Minute30Trader'
+    def __init__(self, market_name, count):
+        super().__init__(market_name)
+        self.json_candles = get_candle_list(market_name, 30, count)
+        self.data = pd.DataFrame(self.json_candles)
+        self.data = self.data[::-1].reset_index(drop=True)
 
     
 

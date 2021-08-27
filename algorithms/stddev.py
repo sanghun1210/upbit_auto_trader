@@ -3,6 +3,7 @@ import pandas as pd
 from pandas_datareader import data
 import statistics as stats
 import math as math
+import numpy as np
 
 #표준편차
 def stddev(pd_dataset):
@@ -42,3 +43,9 @@ def stddev(pd_dataset):
     stddev.plot(ax=ax2, color='b', lw=2., legend=True)
     ax2.axhline(y=stats.mean(stddev_values), color='k')
     plt.show()
+
+def get_stddev(pd_dataset, size):
+    reversed_dataset = pd_dataset['trade_price'][::-1]
+    tp = reversed_dataset[0:20]
+    return np.std(tp,ddof=1)
+

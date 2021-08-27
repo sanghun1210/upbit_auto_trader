@@ -1,18 +1,24 @@
 import pandas as pd
+import numpy as np
 
 from pandas_datareader import data
+
+# MACD선이 0값을 상향돌파 할 경우: MACD선이 0을 상향돌파 할 경우는 단기이동평균선이 장기이동평균선 위에 있는 정배열을 의미한다. 
+# MACD선이 0값을 하향돌파 할 경우: 아래의 그림처럼 MACD선이 0을 하향돌파 할 경우는 단기이동평균선이 장기이동평균선 아래에 있는 역배열을 의미한다. 
+# MACD선이 Signal선을 상향돌파 할 경우: Oscillator가 (+)로 전환된다. -> 매수 포지션
+# MACD선이 Signal선을 하향돌파 할 경우: Oscillator가 (-)로 전환된다. -> 매도 포지션
 
 def macd(pd_dataframe):
     goog_data = pd_dataframe
     close = goog_data['trade_price']
 
-    num_periods_fast = 10 # fast EMA time period
+    num_periods_fast = 12 # fast EMA time period
     K_fast = 2 / (num_periods_fast + 1) # fast EMA smoothing factor
     ema_fast = 0
-    num_periods_slow = 40 # slow EMA time period
+    num_periods_slow = 26 # slow EMA time period
     K_slow = 2 / (num_periods_slow + 1) # slow EMA smoothing factor
     ema_slow = 0
-    num_periods_macd = 20 # MACD EMA time period
+    num_periods_macd = 9 # MACD EMA time period
     K_macd = 2 / (num_periods_macd + 1) # MACD EMA smoothing factor
     ema_macd = 0
 
@@ -56,16 +62,42 @@ def macd(pd_dataframe):
     ema_macd = goog_data['Exponential20DayMovingAverageOfMACD']
     macd_histogram = goog_data['MACDHistorgram']
 
+    goog_data['signal'] =\
+        np.where(goog_data['MovingAverageConvergenceDivergence'][0:]
+                                                > goog_data['Exponential20DayMovingAverageOfMACD'][0:], 1.0, 0.0)
+    goog_data['orders'] = goog_data['signal'].diff()
+
+    initial_capital = float(1000.0)
+    positions = pd.DataFrame(index=goog_data.index).fillna(0.0)
+    portfolio = pd.DataFrame(index=goog_data.index).fillna(0.0)
+    positions['GOOG'] = goog_data['signal'] 
+
+    portfolio['positions'] = (positions.multiply(goog_data['trade_price'], axis = 0))
+
+    portfolio['cash'] = initial_capital - (positions.diff().multiply(goog_data['trade_price'], axis=0)).cumsum()
+    portfolio['total'] = portfolio['positions'] + portfolio['cash']
+
+    print(portfolio)
+
     import matplotlib.pyplot as plt
+
+    
 
     fig = plt.figure()
     ax1 = fig.add_subplot(311, ylabel='Google price in $')
     close_price.plot(ax=ax1, color='g', lw=2., legend=True)
-    ema_f.plot(ax=ax1, color='b', lw=2., legend=True)
-    ema_s.plot(ax=ax1, color='r', lw=2., legend=True)
+    ax1.plot(goog_data.loc[goog_data.orders== 1.0].index,
+            pd_dataframe["trade_price"][goog_data.orders == 1.0],
+            '^', markersize=7, color='k')
+    ax1.plot(goog_data.loc[goog_data.orders== -1.0].index,
+            pd_dataframe["trade_price"][goog_data.orders == -1.0],
+            'v', markersize=7, color='k')
+
     ax2 = fig.add_subplot(312, ylabel='MACD')
     macd.plot(ax=ax2, color='black', lw=2., legend=True)
     ema_macd.plot(ax=ax2, color='g', lw=2., legend=True)
-    ax3 = fig.add_subplot(313, ylabel='MACD')
-    macd_histogram.plot(ax=ax3, color='r', kind='bar', legend=True, use_index=False)
+    # ax3 = fig.add_subplot(313, ylabel='MACD')
+    # macd_histogram.plot(ax=ax3, color='r', kind='bar', legend=True, use_index=False)
+    # plt.show()
+
     plt.show()

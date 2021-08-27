@@ -1,3 +1,4 @@
+from store import Store
 import requests
 import json
 import time
@@ -26,14 +27,54 @@ def get_market_groups(market_group_name) :
 def main():
     try:
         market_group = get_market_groups('KRW')
+
+        store = Store()
+        balance_list = store.get_balance_list()
+
+        balance_name_list = []
+        for balance in balance_list:
+            balance_name_list.append(balance.currency)
         
         for market in market_group:
             market_name = market.get("market")
             data_center = UpbitDataCenter(market_name)
             print(market_name)
-            algorithms.macd(data_center.minute240_trader.data)
-            # ts = algorithms.double_moving_average(data_center.minute60_trader.data,20,100)
-            # algorithms.plot_double_moving_average(ts, data_center.minute60_trader.data)
+            # if market_name == 'KRW-IQ':
+            #x = algorithms.get_stddev(data_center.minute60_trader.data,20)
+        
+            #algorithms.volatility_trend_following(data_center.minute60_trader.data, x)
+            #algorithms.bbands(data_center.minute10_trader.data)
+
+            if market_name == 'KRW-REP' or market_name == 'KRW-STX':
+                continue
+
+            if algorithms.bbands_is_low_touch(data_center.minute10_trader.data):
+                # 구매
+                if market_name in balance_name_list:
+                    print('is_aleady_have')
+                else:
+                    print('buy')
+                    store.buy(market_name, 8000)
+                    balance_list = store.get_balance_list()
+                    balance_name_list = []
+                    for balance in balance_list:
+                        balance_name_list.append(balance.currency)
+
+
+            if algorithms.bbands_is_middle_touch(data_center.minute10_trader.data):
+                if market_name in balance_name_list:
+                    print('sell')
+                    store.sell(market_name, 8000)
+                    balance_list = store.get_balance_list()
+                    balance_name_list = []
+                    for balance in balance_list:
+                        balance_name_list.append(balance.currency)
+                else:
+                    print('no')
+                   
+
+            #ts = algorithms.double_moving_average(data_center.minute10_trader.data,5,20)
+            #algorithms.plot_double_moving_average(ts, data_center.minute10_trader.data)
 
 
     except Exception as e:    

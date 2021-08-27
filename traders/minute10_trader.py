@@ -6,8 +6,6 @@ from .base_trader import *
 
 import os
 import sys
-from .candle import *
-from .calcualtor import *
 
 def get_candle_list(market_name, minute_unit, count) :
     str_list = []
@@ -21,27 +19,9 @@ def get_candle_list(market_name, minute_unit, count) :
 
 
 class Minute10Trader(BaseTrader):
-    def __init__(self, market_name, count, src_logger):
-        super().__init__(market_name, src_logger)
-        json_candles = get_candle_list(market_name, 10, count)
-        self.create_candle_list_from_json(json_candles)
-        self.trader_name = 'Minute10Trader'
-        self.cross_margin = 0.3
-        self.min_ma = 20
-        self.max_ma = 60
-        self.dif_ma = 0.1
-        self.min_bol_width = 4               
-
-
-    def is_good_chart(self):
-        if self.is_growup(3) and self.is_pumped(0, 4) == False and self.is_pumped(1, 4) == False:
-             return True
-        return False
-
-    def is_go_down(self):
-        return self.ma(5) < self.ma(10)
-
-
-    
-
+    def __init__(self, market_name, count):
+        super().__init__(market_name)
+        self.json_candles = get_candle_list(market_name, 10, count)
+        self.data = pd.DataFrame(self.json_candles)
+        self.data = self.data[::-1].reset_index(drop=True)            
 
