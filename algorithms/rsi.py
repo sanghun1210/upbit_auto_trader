@@ -60,3 +60,36 @@ def rsi(pd_dataframe):
     ax3 = fig.add_subplot(313, ylabel='RSI')
     rsi.plot(ax=ax3, color='b', lw=2., legend=True)
     plt.show()
+
+def get_current_rsi(pd_dataframe):
+        price_list = []
+        rsi_list = []
+        price_list = pd_dataframe['trade_price']        
+        rsi_list.append(rsi_calculate(price_list, 14, int(len(price_list))))
+        return rsi_list[0]
+
+#RSI계산 함수
+def rsi_calculate( l, n, sample_number): #l = price_list, n = rsi_number
+    
+    diff=[]
+    au=[]
+    ad=[]
+
+    if len(l) != sample_number: #url call error
+        return -1 
+    for i in range(len(l)-1):
+        diff.append(l[i+1]-l[i]) #price difference
+    
+    au = pd.Series(diff) #list to series
+    ad = pd.Series(diff)
+
+    au[au<0] = 0 #remove ad
+    ad[ad>0] = 0 #remove au
+
+    _gain = au.ewm(com = n, min_periods = sample_number -1).mean() #Exponentially weighted average
+    _loss = ad.abs().ewm(com = n, min_periods = sample_number -1).mean()
+    RS = _gain/_loss
+
+    rsi = 100-(100 / (1+RS.iloc[-1]))
+
+    return rsi

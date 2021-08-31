@@ -4,9 +4,8 @@ from pandas_datareader import data
 import statistics as stats
 
 #단순 이동 평균
-def sma(pd_dataframe):
+def sma(pd_dataframe, time_period):
     close = pd_dataframe['trade_price']
-    time_period = 20 # number of days over which to average
     history = [] # to track a history of prices
     sma_values = [] # to track simple moving average values
     for close_price in close:
@@ -21,11 +20,16 @@ def sma(pd_dataframe):
 
     close_price = pd_dataframe['ClosePrice']
     sma = pd_dataframe['Simple20DayMovingAverage']
+    return pd_dataframe
 
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
 
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, ylabel='Google price in $')
-    close_price.plot(ax=ax1, color='g', lw=2., legend=True)
-    sma.plot(ax=ax1, color='r', lw=2., legend=True)
-    plt.show()
+    # fig = plt.figure()
+    # ax1 = fig.add_subplot(111, ylabel='Google price in $')
+    # close_price.plot(ax=ax1, color='g', lw=2., legend=True)
+    # sma.plot(ax=ax1, color='r', lw=2., legend=True)
+    # plt.show()
+
+def get_current_sma(pd_dataframe, time_period):
+    goog_data = sma(pd_dataframe, time_period)
+    return goog_data['Simple20DayMovingAverage'].iloc[-1]

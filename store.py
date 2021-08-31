@@ -33,7 +33,6 @@ class Store():
         headers = {"Authorization": authorize_token}
 
         res = requests.get(self.server_url + "/v1/accounts", headers=headers)
-
         balances = []
 
         length = len(res.json())
@@ -72,14 +71,15 @@ class Store():
         is_already_have_this = (coin_balance != '0.0')
         #print("is_already_have_this coin : ", is_already_have_this, market_name)
         return is_already_have_this
+
         
-    def buy(self, market_name, money):            
+    def buy(self, market_name, volume, price):            
         query = {
             'market': market_name,
             'side': 'bid',
-            'volume': '',
-            'price': str(money),
-            'ord_type': 'price',
+            'volume': str(volume),  #balance
+            'price': str(price),
+            'ord_type': 'limit',
         }
         print(query)
         query_string = urlencode(query).encode()
@@ -100,13 +100,13 @@ class Store():
 
         res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
 
-    def sell(self, market_name, money):            
+    def sell(self, market_name, volume, price):            
         query = {
             'market': market_name,
             'side': 'ask',
-            'volume': '',
-            'price': str(money),
-            'ord_type': 'price',
+            'volume': str(volume),  #balance
+            'price': str(price),
+            'ord_type': 'limit',
         }
         print(query)
         query_string = urlencode(query).encode()
