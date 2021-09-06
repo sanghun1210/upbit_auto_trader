@@ -44,14 +44,18 @@ def is_nice_main_trader(trader):
     current_price = trader.data['trade_price'].iloc[-1]
     # print(algorithms.get_current_sma(trader.data, 8))
     # print(algorithms.get_current_rsi(trader.data))
+
+    # if current_price < algorithms.get_current_sma(trader.data, 10):
+    #     return False
     
-    if current_price >= algorithms.get_current_sma(trader.data, 8) \
-        and algorithms.get_current_rsi(trader.data) : 
+    if current_price >= algorithms.get_current_sma(trader.data, 10) \
+        and algorithms.get_current_rsi(trader.data) > 50:
         return True
     return False
         
 
-def is_nice_trader(trader, max_bol_width):
+def is_nice_trader(trader, max_bol_width, add_msg):
+    add_msg[0] = ''
     current_price = trader.data['trade_price'].iloc[-1]
     current_rsi = algorithms.get_current_rsi(trader.data) 
     #mos = trader.get_momentum_list()
@@ -59,9 +63,14 @@ def is_nice_trader(trader, max_bol_width):
     if algorithms.bbands_width(trader.data,8) > max_bol_width:
         return False
 
-    if current_rsi >= 45 and current_rsi <= 65 :
-        if current_price >= algorithms.get_current_sma(trader.data, 5) :
+    if current_rsi >= 48 and current_rsi <= 70 and algorithms.macd_line_over_than_signal(trader.data):
+        if current_price >= algorithms.get_current_sma(trader.data, 8):
+            add_msg[0] = ' good_pattern'
             return True
+
+    # if algorithms.bbands_is_low_touch(trader.data, 8):
+    #     add_msg[0] = ' low_pattern'
+    #     return True
 
     return False
 
@@ -78,44 +87,59 @@ def main():
                 data_center = UpbitDataCenter(coin_name)
                 print(coin_name)
 
+                add_msg = []
+                add_msg.append('')
+
                 current_price = data_center.day_trader.data['trade_price'].iloc[-1]
                 if current_price < algorithms.get_current_sma(data_center.day_trader.data, 5):
                     continue
 
-                if is_nice_main_trader(data_center.minute240_trader) and \
-                    is_nice_trader(data_center.minute30_trader, 4):
-                    coin_name = coin_name + ' 30m!'
-                    print('30m!')
+                if is_nice_main_trader(data_center.week_trader) and \
+                    is_nice_trader(data_center.day_trader, 15, add_msg):
+                    coin_name = coin_name + ' day!' + add_msg[0]
+                    print(coin_name)
                     is_buy = True
+
 
                 if is_nice_main_trader(data_center.day_trader) and \
-                    is_nice_trader(data_center.minute60_trader, 6):
-                    coin_name = coin_name + ' 60m!'
-                    print('60m!')
+                    is_nice_trader(data_center.minute240_trader, 10, add_msg):
+                    coin_name = coin_name + ' 240m! ' + add_msg[0]
+                    print(coin_name)
                     is_buy = True
 
-                if algorithms.macd_cross(data_center.minute60_trader.data):
-                    coin_name = coin_name + ' macd60!'
-                    print('macd60!')
+                if is_nice_main_trader(data_center.minute240_trader) and \
+                    is_nice_trader(data_center.minute30_trader, 3.5, add_msg):
+                    coin_name = coin_name + ' 30m! ' + add_msg[0]
+                    print(coin_name)
                     is_buy = True
 
-                if algorithms.macd_cross(data_center.minute240_trader.data):
-                    coin_name = coin_name + ' macd240!'
-                    print('macd240!')
-                    is_buy = True
+                # if is_nice_main_trader(data_center.minute60_trader) and \
+                #     is_nice_trader(data_center.minute10_trader, 2, add_msg):
+                #     coin_name = coin_name + ' 10m! ' + add_msg[0]
+                #     print(coin_name)
+                #     is_buy = True
 
-                if algorithms.macd_cross(data_center.day_trader.data):
-                    coin_name = coin_name + ' macd_day!'
-                    print('macd_day!')
-                    is_buy = True
+                
 
-                if is_buy:
+                # if is_nice_main_trader(data_center.day_trader) and \
+                #     is_nice_trader(data_center.minute240_trader, 11, add_msg):
+                #     coin_name = coin_name + ' 240m!' + add_msg[0]
+                #     print('240m!')
+                #     is_buy = True
+
+                # if is_nice_main_trader(data_center.week_trader) and \
+                #     is_nice_trader(data_center.day_trader, 13, add_msg):
+                #     coin_name = coin_name + ' day!' + add_msg[0]
+                #     print('240m!')
+                #     is_buy = True
+
+                if is_buy :
                     buy_list.append(coin_name)
 
             if len(buy_list) > 0:
                 current_result = '\r\n'.join(buy_list)
                 send_mail(current_result, "check result")
-            time.sleep(600)
+            time.sleep(800)
 
         except Exception as e:    
             print("raise error ", e)

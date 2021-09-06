@@ -93,5 +93,14 @@ def bbands_width(pd_dataframe, time_period):
     return get_margin(uband.iloc[-1], lband.iloc[-1])
 
 
+def bbands_is_low_touch(pd_dataframe, time_period):
+    goog_data = bbands(pd_dataframe, time_period)
+    mband = goog_data['MiddleBollingerBand20DaySMA']
+    uband = goog_data['UpperBollingerBand20DaySMA2StdevFactor']
+    lband = goog_data['LowerBollingerBand20DaySMA2StdevFactor']
+    # print(uband.iloc[-1])
+    # print(mband.iloc[-1])
+    # print(lband.iloc[-1])
+    return lband.iloc[-1] >= pd_dataframe['low_price'].iloc[-1] 
     
 

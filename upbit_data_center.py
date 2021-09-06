@@ -37,5 +37,5 @@ class UpbitDataCenter():
         self.minute240_trader = Minute240Trader(coin_name, 200)
         time.sleep(0.15)
         self.day_trader = DayTrader(coin_name, 80)
-        # time.sleep(0.15)
-        # self.week_trader = WeekTrader(coin_name, 20, src_logger)
+        time.sleep(0.15)
+        self.week_trader = WeekTrader(coin_name, 50)
