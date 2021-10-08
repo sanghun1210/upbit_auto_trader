@@ -5,6 +5,13 @@ from .ema import *
 from .apo import *
 from .rsi import *
 from .macd import *
+from .mom import *
+from .cci import *
+from .obv import *
 from .double_moving_average import *
 from .basic_trend_following import *
 from .volatility_trend_following import *
+from .stochastic_slow import *
+from .tutle import *
+from .super_trend import *
+from .heikin_ashi import *
