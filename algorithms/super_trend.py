@@ -28,8 +28,6 @@ def atr(data, period):
 def supertrend(df, period=7, atr_multiplier=2):
     ST = ta.supertrend(df['high_price'], df['low_price'], df['trade_price'], 7, 2)
     ST.rename(columns = {'SUPERTd_7_2.0' : 'SUPERTd_7_2'}, inplace = True)
-    print(ST)
-
     import matplotlib.pyplot as plt
 
 
@@ -51,18 +49,16 @@ def supertrend(df, period=7, atr_multiplier=2):
 
     return ST
 
-def is_supertrend_signal(df):
+def get_supertrend_df(df):
     ST = supertrend(df)
     sut_list = ST['SUPERTd_7_2']
-
     first = sut_list.iloc[0]
     for i in range(1,len(sut_list)):
         if first == sut_list.iloc[i]:
             sut_list.iloc[i] = 0
         else:
             first = sut_list.iloc[i]
-
-    return sut_list.iloc[-1] > 0
+    return sut_list
 
 in_position = False
 

@@ -6,9 +6,17 @@ def send_mail(msg, subject):
     smtp = smtplib.SMTP('smtp.gmail.com', 587)
     smtp.ehlo()
     smtp.starttls()
-    smtp.login(me, 'dlthfk208.')
+    smtp.login(me, 'emkyudballjbrzdb')
  
     msg = MIMEText(msg)
     msg['Subject'] = subject
     smtp.sendmail(me, me, msg.as_string())
     smtp.quit()
+
+
+def main():
+    send_mail('aaaa','bbb')
+    
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()

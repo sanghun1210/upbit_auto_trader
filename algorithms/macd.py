@@ -137,10 +137,10 @@ def macd_plot(goog_data):
 
 def macd(goog_data):
     close = goog_data['trade_price']
-    num_periods_fast = 12 # fast EMA time period
+    num_periods_fast = 6 # fast EMA time period
     K_fast = 2 / (num_periods_fast + 1) # fast EMA smoothing factor
     ema_fast = 0
-    num_periods_slow = 26 # slow EMA time period
+    num_periods_slow = 19 # slow EMA time period
     K_slow = 2 / (num_periods_slow + 1) # slow EMA smoothing factor
     ema_slow = 0
     num_periods_macd = 9 # MACD EMA time period
@@ -192,13 +192,11 @@ def macd(goog_data):
     goog_data['signal'][0:] = np.where(macd[0:] > ema_macd[0:], 1.0, 0.0)
     goog_data['orders'] = goog_data['signal'].diff()
 
-    print(goog_data)
     return goog_data
 
 def macd_line_over_than_signal(pd_dataframe):
     df = macd(pd_dataframe)
     return df['MACDHistorgram'].iloc[-1] > 0
-
 
 def macd_cross(pd_dataframe):
     df = macd(pd_dataframe)

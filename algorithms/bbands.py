@@ -3,14 +3,12 @@ import pandas as pd
 from pandas_datareader import data
 import numpy as np
 
-def bbands(pd_dataframe): 
+def bbands(pd_dataframe, time_period): 
     goog_data = pd_dataframe
     close = goog_data['trade_price']
 
     import statistics as stats
     import math as math
-
-    time_period = 7 # history length for Simple Moving Average for middle band
     stdev_factor = 2 # Standard Deviation Scaling factor for the upper and lower bands
     history = [] # price history for computing simple moving average
     sma_values = [] # moving average of prices for visualization purposes
@@ -101,3 +99,21 @@ def bbands(pd_dataframe):
 def get_current_bbands_position(pd_dataframe):
     goog_data = bbands(pd_dataframe)
     return goog_data['signal'].iloc[-1]
+
+def get_margin(a, b):
+    ma = 0
+    if a > b:
+        ma = ((a - b) / a) * 100
+    else : 
+        ma = ((b - a) / b) * 100
+    return ma
+
+def bbands_width(pd_dataframe, time_period):
+    goog_data = bbands(pd_dataframe, time_period)
+    mband = goog_data['MiddleBollingerBand20DaySMA']
+    uband = goog_data['UpperBollingerBand20DaySMA2StdevFactor']
+    lband = goog_data['LowerBollingerBand20DaySMA2StdevFactor']
+    # print(uband.iloc[-1])
+    # print(mband.iloc[-1])
+    # print(lband.iloc[-1])
+    return get_margin(uband.iloc[-1], lband.iloc[-1])

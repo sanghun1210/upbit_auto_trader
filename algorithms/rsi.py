@@ -4,9 +4,9 @@ from pandas_datareader import data
 
 import statistics as stats
 
-def rsi(pd_dataframe):
+def rsi(pd_dataframe ,period):
     close = pd_dataframe['trade_price']
-    time_period = 14 # look back period to compute gains & losses
+    time_period = period # look back period to compute gains & losses
     gain_history = [] # history of gains over look back period (0 if no gain, magnitude of gain if gain)
     loss_history = [] # history of losses over look back period (0 if no loss, magnitude of loss if loss)
     avg_gain_values = [] # track avg gains for visualization purposes
@@ -48,54 +48,7 @@ def rsi(pd_dataframe):
     rs_gain = pd_dataframe['RelativeStrengthAvgGainOver20Days']
     rs_loss = pd_dataframe['RelativeStrengthAvgLossOver20Days']
     rsi = pd_dataframe['RelativeStrengthIndicatorOver20Days']
-    goog_data = pd_dataframe
-
-    print(rsi)
-
-    goog_data['signal'] = pd.Series(index=goog_data.index)
-    for i in range(len(close_price)):
-        if i == 0:
-            goog_data['signal'].iloc[i] = 0.0
-        elif rsi.iloc[i] < 30 :
-            goog_data['signal'].iloc[i] = 1.0
-        elif rsi.iloc[i] > 70:
-            goog_data['signal'].iloc[i] = 0.0
-        else:
-            goog_data['signal'].iloc[i] = goog_data['signal'].iloc[i-1] 
-            
-
-    goog_data['orders'] = goog_data['signal'].diff()
-    
-    import matplotlib.pyplot as plt
-
-    # fig = plt.figure()
-    # ax1 = fig.add_subplot(311, ylabel='Google price in $')
-    # close_price.plot(ax=ax1, color='black', lw=2., legend=True)
-    # ax2 = fig.add_subplot(312, ylabel='RS')
-    # rs_gain.plot(ax=ax2, color='g', lw=2., legend=True)
-    # rs_loss.plot(ax=ax2, color='r', lw=2., legend=True)
-    # ax3 = fig.add_subplot(313, ylabel='RSI')
-    # rsi.plot(ax=ax3, color='b', lw=2., legend=True)
-    # plt.show()
-
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, ylabel='Google price in $')
-
-    ax1.plot(goog_data.loc[goog_data.orders== 1.0].index,
-            pd_dataframe["trade_price"][goog_data.orders == 1.0],
-            '^', markersize=7, color='k')
-
-    ax1.plot(goog_data.loc[goog_data.orders== -1.0].index,
-            pd_dataframe["trade_price"][goog_data.orders == -1.0],
-            'v', markersize=7, color='k')
-
-    close_price.plot(ax=ax1, color='g', lw=2., legend=True)
-    # mband.plot(ax=ax1, color='b', lw=2., legend=True)
-    # uband.plot(ax=ax1, color='g', lw=2., legend=True)
-    # lband.plot(ax=ax1, color='r', lw=2., legend=True)
-    plt.show()
-
-    return pd_dataframe
+    return rsi
 
 def get_current_rsi(pd_dataframe):
         price_list = []
